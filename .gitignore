@@ -1,9 +1,0 @@
-*.pyc
-build
-dist
-test
-*.egg_info
-.qt_for_python
-dist.zip
-main.spec
-__pycache__
