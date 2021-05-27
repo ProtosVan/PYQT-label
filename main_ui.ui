@@ -137,8 +137,8 @@
      <rect>
       <x>1360</x>
       <y>350</y>
-      <width>20</width>
-      <height>20</height>
+      <width>4</width>
+      <height>4</height>
      </rect>
     </property>
     <property name="text">
@@ -156,8 +156,8 @@
      <rect>
       <x>1360</x>
       <y>380</y>
-      <width>20</width>
-      <height>20</height>
+      <width>4</width>
+      <height>4</height>
      </rect>
     </property>
     <property name="text">
@@ -175,8 +175,8 @@
      <rect>
       <x>1360</x>
       <y>410</y>
-      <width>20</width>
-      <height>20</height>
+      <width>4</width>
+      <height>4</height>
      </rect>
     </property>
     <property name="text">
@@ -194,8 +194,8 @@
      <rect>
       <x>1360</x>
       <y>440</y>
-      <width>20</width>
-      <height>20</height>
+      <width>4</width>
+      <height>4</height>
      </rect>
     </property>
     <property name="text">
@@ -254,8 +254,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1182</x>
-     <y>663</y>
+     <x>1320</x>
+     <y>329</y>
     </hint>
     <hint type="destinationlabel">
      <x>769</x>
