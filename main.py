@@ -69,13 +69,18 @@ class MainWindowClass(QMainWindow, main_ui.Ui_ZC_Label):
         self.chosed_action = "E1"
 
     def A_prev_clicked(self):
-        if self.label_now["Q"][0] > 0:
-            json_name = self.img_list[self.img_now][:-4] + ".json"
+        json_name = self.img_list[self.img_now][:-4] + ".json"
+        if self.label_now["Q"][0] > 0 and self.label_now["W"][0] > 0 and self.label_now["E2"][0] > 0:
             if not os.path.exists(json_name):
                 self.already_labeled += 1
                 self.labeled_number.setText(str(self.already_labeled))
             with open(json_name, 'w') as json_file:
                 json.dump(self.label_now, json_file)
+        else:
+            if os.path.exists(json_name):
+                self.already_labeled -=1
+                self.labeled_number.setText(str(self.already_labeled))
+                os.remove(json_name)
         self.img_now -= 1 
         if self.img_now == -1:
             self.no_prev_msg_box.exec_()
@@ -85,13 +90,18 @@ class MainWindowClass(QMainWindow, main_ui.Ui_ZC_Label):
         # TODO
 
     def D_next_clicked(self):
-        if self.label_now["Q"][0] != 0 or self.label_now["W"][0] != 0 or self.label_now["E1"][0] != 0:
-            json_name = self.img_list[self.img_now][:-4] + ".json"
+        json_name = self.img_list[self.img_now][:-4] + ".json"
+        if self.label_now["Q"][0] > 0 and self.label_now["W"][0] > 0 and self.label_now["E2"][0] > 0:
             if not os.path.exists(json_name):
                 self.already_labeled += 1
                 self.labeled_number.setText(str(self.already_labeled))
             with open(json_name, 'w') as json_file:
                 json.dump(self.label_now, json_file)
+        else:
+            if os.path.exists(json_name):
+                self.already_labeled -=1
+                self.labeled_number.setText(str(self.already_labeled))
+                os.remove(json_name)
         self.img_now += 1 
         if self.img_now == self.img_num:
             self.no_next_msg_box.exec_()
@@ -104,42 +114,41 @@ class MainWindowClass(QMainWindow, main_ui.Ui_ZC_Label):
         x = event.pos().x()
         y = event.pos().y()
         if self.chosed_action == "E2":
-            self.E2_point.move(x - point_size, y - point_size)
             self.label_now["E2"] = [x / self.scale_ratio, y / self.scale_ratio]
+            self.image_window.update()
             self.D_next_clicked()
             self.chosed_action = "Q"
-            self.draw_rect = False
 
     def action_move_on_image(self, event):
         x = event.pos().x()
         y = event.pos().y()
         self.label_cursor_coord.setText(str(x) + ", " + str(y))
         if self.chosed_action == "E2":
-            self.E2_point.move(x - point_size, y - point_size)
-        self.update()
+            self.label_now["E2"] = [x / self.scale_ratio, y / self.scale_ratio]
+            self.image_window.update()
 
     def action_press_on_image(self, event):
         x = event.pos().x()
         y = event.pos().y()
         if self.chosed_action == "Q":
-            self.Q_point.move(x - point_size, y - point_size)
             self.label_now["Q"] = [x / self.scale_ratio, y / self.scale_ratio]
             self.chosed_action = "W"
+            self.image_window.update()
             return
         elif self.chosed_action == "W":
-            self.W_point.move(x - point_size, y - point_size)
             self.label_now["W"] = [x / self.scale_ratio, y / self.scale_ratio]
             self.chosed_action = "E1"
+            self.image_window.update()
             return
         elif self.chosed_action == "E1":
-            self.E1_point.move(x - point_size, y - point_size)
             self.label_now["E1"] = [x / self.scale_ratio, y / self.scale_ratio]
             self.chosed_action = "E2"
-            self.draw_rect = True
+            self.image_window.update()
             return
             #next page
     
     def user_paint_event(self, event):
+        self.paintEvent(event)
         painter = QPainter(self.image_window)
         '''
         if self.raw_pixmap != None:
@@ -153,11 +162,14 @@ class MainWindowClass(QMainWindow, main_ui.Ui_ZC_Label):
             painter.drawPixmap(0, 0, int(self.raw_width * self.scale_ratio), int(self.raw_height * self.scale_ratio), self.raw_pixmap)
             rect = QRect(int(self.label_now["E1"][0] * self.scale_ratio - point_size), int(self.label_now["E1"][1] * self.scale_ratio - point_size), int((self.label_now["E2"][0] - self.label_now["E1"][0]) * self.scale_ratio) + 2 * point_size, int((self.label_now["E2"][1] - self.label_now["E1"][1]) * self.scale_ratio) + 2 * point_size)
             painter.setPen(QPen(Qt.green, 4))
-            painter.drawRect(int(self.label_now["W"][0] * self.scale_ratio - point_size), int(self.label_now["W"][1] * self.scale_ratio - point_size), point_size * 2, point_size * 2)
+            if self.label_now["W"][0] > 0 :
+                painter.drawRect(int(self.label_now["W"][0] * self.scale_ratio - point_size), int(self.label_now["W"][1] * self.scale_ratio - point_size), point_size * 2, point_size * 2)
             painter.setPen(QPen(Qt.red, 4))
-            painter.drawRect(int(self.label_now["Q"][0] * self.scale_ratio - point_size), int(self.label_now["Q"][1] * self.scale_ratio - point_size), point_size * 2, point_size * 2)
+            if self.label_now["Q"][0] > 0 :
+                painter.drawRect(int(self.label_now["Q"][0] * self.scale_ratio - point_size), int(self.label_now["Q"][1] * self.scale_ratio - point_size), point_size * 2, point_size * 2)
             painter.setPen(QPen(Qt.yellow, 4))
-            painter.drawRect(rect)
+            if self.label_now["E2"][0] > 0 :
+                painter.drawRect(rect)
 
     def load_pic_show(self, imgName):
         self.raw_pixmap = QtGui.QPixmap(imgName)
@@ -178,12 +190,8 @@ class MainWindowClass(QMainWindow, main_ui.Ui_ZC_Label):
                               "W":  [-1, -1],
                               "E1": [-1, -1],
                               "E2": [-1, -1]}
-            self.Q_point.move(1360, 350)
-            self.W_point.move(1360, 380)
-            self.E1_point.move(1360, 410)
-            self.E2_point.move(1360, 440)
         self.chosed_action = "Q"
-        self.update()
+        self.image_window.update()
     
     def openfolder(self):
         self.img_list = []
@@ -199,6 +207,13 @@ class MainWindowClass(QMainWindow, main_ui.Ui_ZC_Label):
                 self.img_list.append(file_path)
                 self.img_num += 1
             if file_path.endswith(".json"):
+                checker = []
+                file_path = os.path.join(self.folder_directory, file_path)
+                with open(file_path, 'r') as temp_file:
+                    checker = json.load(temp_file)
+                if checker["Q"][0] < 0 or checker["W"][0] < 0 or checker["E2"][0] < 0:
+                    os.remove(file_path)
+                    self.already_labeled -= 1
                 self.already_labeled += 1
         if self.img_num != 0:
             self.load_pic_show(self.img_list[self.img_now])
