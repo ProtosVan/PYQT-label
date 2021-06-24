@@ -5,3 +5,5 @@ __pycache__
 *.zip
 *.spec
 dist
+test*
+.qt*
